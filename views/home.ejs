@@ -211,6 +211,7 @@
     </style>
 
     <script>
+      let myChart = null;
       $(document).ready(function () {
         $('input[type="radio"]').click(function () {
           var value = $(this).val();
@@ -232,6 +233,7 @@
         const apartments = <%- JSON.stringify(apartments) %>;
         const data = <%- JSON.stringify(data) %>;
       <% } %>;
+
 
       let container = document.getElementById("map");
       let options = {
@@ -308,7 +310,7 @@
           data
         );
 
-        let monthData = monthApartmentData(clickedData, JSON.parse(data));
+        let monthData = monthApartmentData(clickedData, data);
         showChart(monthData);
 
         updateTableContent(clickedApartment, clickedData);
@@ -456,8 +458,11 @@
 
       function showChart(monthData) {
         let ctx = document.getElementById("chart").getContext("2d");
+        if (myChart !== null) {
+          myChart.destroy();
+        }
         if (Object.keys(monthData).length === 0) {
-          new Chart(ctx, {
+          myChart = new Chart(ctx, {
             type: "bar",
             data: {
               labels: [],
@@ -476,7 +481,7 @@
           let transactionVolumes = calculateTransactionVolumes(monthData);
           let averagePrices = calculateAveragePrices(monthData);
 
-          let myChart = new Chart(ctx, {
+          myChart = new Chart(ctx, {
             type: "bar",
             data: {
               labels: [
@@ -490,6 +495,7 @@
                 "8월",
                 "9월",
                 "10월",
+                "11월",
               ],
               datasets: [
                 {
@@ -511,6 +517,7 @@
                     "rgba(255, 206, 86, 0.2)",
                     "rgba(75, 192, 192, 0.2)",
                     "rgba(153, 102, 255, 0.2)",
+                    "rgba(255, 159, 64, 0.2)",
                     "rgba(255, 99, 132, 0.2)",
                     "rgba(54, 162, 235, 0.2)",
                     "rgba(255, 206, 86, 0.2)",
@@ -523,6 +530,7 @@
                     "rgba(255, 206, 86, 1)",
                     "rgba(75, 192, 192, 1)",
                     "rgba(153, 102, 255, 1)",
+                    "rgba(255, 159, 64, 1)",
                     "rgba(255, 99, 132, 1)",
                     "rgba(54, 162, 235, 1)",
                     "rgba(255, 206, 86, 1)",
@@ -543,6 +551,9 @@
                     position: "left",
                     id: "y-axis-1",
                     labelString: "평균 거래금액(만원)",
+                    ticks: {
+                      beginAtZero: true,
+                    },
                   },
                   {
                     type: "linear",
@@ -550,6 +561,9 @@
                     position: "right",
                     id: "y-axis-2",
                     labelString: "거래량",
+                    ticks: {
+                      beginAtZero: true,
+                    },
                   },
                 ],
                 xAxes: [
@@ -568,7 +582,8 @@
       }
 
       function monthApartmentData(foundData, data) {
-        const jsonData = JSON.parse(data)
+        const parsedData = data.map((item) => JSON.parse(item));
+
         if (foundData) {
           let monthData = {
             jan: [],
@@ -581,9 +596,10 @@
             aug: [],
             sep: [],
             oct: [],
+            nov: [],
           };
 
-          data.forEach((item) => {
+          parsedData.forEach((item) => {
             if (item["도로명코드"] === foundData["도로명코드"]) {
               switch (item["월"]) {
                 case "1":
@@ -615,6 +631,9 @@
                   break;
                 case "10":
                   monthData.oct.push(item);
+                  break;
+                case "11":
+                  monthData.nov.push(item);
                   break;
                 default:
                   break;
