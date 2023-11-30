@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>아파트 거래정보</title>
+    <script
+      type="text/javascript"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b50b4f49e5237883c18078faad157119&libraries=services,clusterer,drawing"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+      integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I"
+      crossorigin="anonymous"
+    />
+    <script
+      crossorigin="anonymous"
+      src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+
+  <body>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <%- include('./partials/navbar') %>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-6">
+          <div id="map" style="width: 100%; height: 100vh"></div>
+        </div>
+        <div class="col-md-6">
+          <%- include('./partials/flash')%>
+          <div class="container-fluid mt-3">
+            <div class="d-flex justify-content-between">
+              <div class="btn-group mb-1" role="group">
+                <input
+                  type="radio"
+                  class="btn-check"
+                  name="btnradio"
+                  id="btnradio1"
+                  autocomplete="off"
+                  value="1"
+                  checked
+                />
+                <label class="btn btn-outline-primary" for="btnradio1"
+                  >거래정보</label
+                >
+
+                <input
+                  type="radio"
+                  class="btn-check"
+                  name="btnradio"
+                  id="btnradio2"
+                  autocomplete="off"
+                  value="2"
+                />
+                <label class="btn btn-outline-primary" for="btnradio2"
+                  >그래프</label
+                >
+              </div>
+              <form id="searchForm" class="d-flex mr-2" role="search">
+                <input
+                  id="searchInput"
+                  class="form-control me-2 ms-2"
+                  type="search"
+                  placeholder="Search"
+                  aria-label="Search"
+                />
+                <button id="searchButton" class="btn btn-outline-primary me-2">
+                  Search
+                </button>
+              </form>
+            </div>
+            <div id="apartmentDetails">
+              <div class="mt-1 d-flex flex-column">
+                <h6>🏙아파트 최신 거래정보</h6>
+                <div class="d-flex">
+                  <table class="table">
+                    <tbody id="apartmentDetailTable">
+                      <tr>
+                        <th scope="row" class="th">이름</th>
+                        <td style="font-weight: bold"></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">아파트명</th>
+                        <td style="font-weight: bold"></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">거래금액(만원)</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">전용면적(m²)</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">우편번호</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">법정동코드</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">도로명코드</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">주소</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">상세주소</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">참고항목</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">층</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">거래유형</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">건축년도</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">계약일자</th>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="th">일련번호</th>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div id="apartmentGraph">
+              <div class="mt-1 mr-2 d-flex flex-column">
+                <h6>📊아파트 거래금액 그래프</h6>
+                <canvas id="chart"></canvas>
+              </div>
+              <div id="apartmentInformation" class="mt-2">
+                <h6>🏢아파트 정보</h6>
+                <table class="table">
+                  <tbody id="apartmentInformationTable">
+                    <tr>
+                      <th scope="row" class="th">이름</th>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <th scope="row" class="th">아파트명</th>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <th scope="row" class="th">주소</th>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <th scope="row" class="th">상세주소</th>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <th scope="row" class="th">일련번호</th>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .navbar {
+        margin: 0;
+      }
+
+      .container-fluid {
+        padding: 0;
+      }
+
+      .col-md-8 {
+        padding: 0;
+      }
+
+      .col {
+        padding: 0;
+      }
+
+      .th {
+        width: 200px;
+      }
+    </style>
+
+    <script>
+      $(document).ready(function () {
+        $('input[type="radio"]').click(function () {
+          var value = $(this).val();
+
+          if (value === "1") {
+            $("#apartmentDetails").show();
+            $("#apartmentGraph").hide();
+          } else if (value === "2") {
+            $("#apartmentDetails").hide();
+            $("#apartmentGraph").show();
+          }
+        });
+
+        $("#apartmentDetails").show();
+        $("#apartmentGraph").hide();
+      });
+
+      <% if (currentUser) { %>
+        const apartments = <%- JSON.stringify(apartments) %>;
+        const data = <%- JSON.stringify(data) %>;
+      <% } %>;
+
+      let container = document.getElementById("map");
+      let options = {
+        center: new kakao.maps.LatLng(36.8, 127.5),
+        level: 12,
+      };
+      let map = new kakao.maps.Map(container, options);
+      let mapTypeControl = new kakao.maps.MapTypeControl();
+      map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+      let zoomControl = new kakao.maps.ZoomControl();
+      map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+      let geocoder = new kakao.maps.services.Geocoder();
+
+      let infowindow = new kakao.maps.InfoWindow({});
+
+      for (let i = 0; i < apartments.length; i++) {
+        let iwContent = "<div>" + apartments[i].name + "</div>";
+        geocoder.addressSearch(
+          apartments[i].address,
+          createMarkerCallback(iwContent, i)
+        );
+
+        function createMarkerCallback(content, apartmentIndex) {
+          return function (result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+              let coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+              let marker = new kakao.maps.Marker({
+                map: map,
+                position: coords,
+              });
+
+              kakao.maps.event.addListener(marker, "mouseover", function () {
+                infowindow.setContent(content);
+                infowindow.open(map, marker);
+              });
+
+              kakao.maps.event.addListener(marker, "mouseout", function () {
+                infowindow.close();
+              });
+
+              kakao.maps.event.addListener(marker, "click", function () {
+                let clickedApartment = apartments[apartmentIndex];
+
+                let clickedData = findDataByRoadnameCode(
+                  clickedApartment.roadnameCode,
+                  data
+                );
+
+                let monthData = monthApartmentData(clickedData, data);
+                showChart(monthData);
+
+                updateTableContent(clickedApartment, clickedData);
+              });
+            }
+          };
+        }
+      }
+      $("#searchButton").on("click", function (event) {
+        event.preventDefault();
+
+        let searchValue = $("#searchInput").val();
+
+        let clickedApartment = apartments.find(function (apartment) {
+          return (
+            apartment.name.includes(searchValue) ||
+            apartment.roadnameCode.includes(searchValue)
+          );
+        });
+
+        let clickedData = findDataByRoadnameCode(
+          clickedApartment.roadnameCode,
+          data
+        );
+
+        let monthData = monthApartmentData(clickedData, JSON.parse(data));
+        showChart(monthData);
+
+        updateTableContent(clickedApartment, clickedData);
+        $("#searchInput").val("");
+      });
+
+      function updateTableContent(apartment, data) {
+        if (data) {
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(1) td"
+          ).textContent = apartment.name;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(2) td"
+          ).textContent = data["아파트"];
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(3) td"
+          ).textContent = data["거래금액"];
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(4) td"
+          ).textContent = data["전용면적"];
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(5) td"
+          ).textContent = apartment.postcode;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(6) td"
+          ).textContent = apartment.bcode;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(7) td"
+          ).textContent = apartment.roadnameCode;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(8) td"
+          ).textContent = apartment.address;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(9) td"
+          ).textContent = apartment.address2;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(10) td"
+          ).textContent = apartment.references;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(11) td"
+          ).textContent = data["층"];
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(12) td"
+          ).textContent = data["거래유형"];
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(13) td"
+          ).textContent = data["건축년도"];
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(14) td"
+          ).textContent =
+            data["년"] + "년 " + data["월"] + "월 " + data["일"] + "일";
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(15) td"
+          ).textContent = data["일련번호"];
+          document.querySelector(
+            "#apartmentInformationTable tr:nth-child(1) td"
+          ).textContent = apartment.name;
+          document.querySelector(
+            "#apartmentInformationTable tr:nth-child(2) td"
+          ).textContent = data["아파트"];
+          document.querySelector(
+            "#apartmentInformationTable tr:nth-child(3) td"
+          ).textContent = apartment.address;
+          document.querySelector(
+            "#apartmentInformationTable tr:nth-child(4) td"
+          ).textContent = apartment.address2;
+          document.querySelector(
+            "#apartmentInformationTable tr:nth-child(5) td"
+          ).textContent = data["일련번호"];
+        } else {
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(1) td"
+          ).textContent = apartment.name;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(2) td"
+          ).textContent = "";
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(3) td"
+          ).textContent = "";
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(4) td"
+          ).textContent = "";
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(5) td"
+          ).textContent = apartment.postcode;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(6) td"
+          ).textContent = apartment.bcode;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(7) td"
+          ).textContent = apartment.roadnameCode;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(8) td"
+          ).textContent = apartment.address;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(9) td"
+          ).textContent = apartment.address2;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(10) td"
+          ).textContent = apartment.references;
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(11) td"
+          ).textContent = "";
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(12) td"
+          ).textContent = "";
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(13) td"
+          ).textContent = "";
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(14) td"
+          ).textContent = "";
+          document.querySelector(
+            "#apartmentDetailTable tr:nth-child(15) td"
+          ).textContent = "";
+          document.querySelector(
+            "#apartmentInformationTable tr:nth-child(1) td"
+          ).textContent = apartment.name;
+          document.querySelector(
+            "#apartmentInformationTable tr:nth-child(2) td"
+          ).textContent = "";
+          document.querySelector(
+            "#apartmentInformationTable tr:nth-child(3) td"
+          ).textContent = apartment.address;
+          document.querySelector(
+            "#apartmentInformationTable tr:nth-child(4) td"
+          ).textContent = apartment.address2;
+          document.querySelector(
+            "#apartmentInformationTable tr:nth-child(5) td"
+          ).textContent = "";
+        }
+      }
+
+      function findDataByRoadnameCode(apartmentCode, data) {
+        let foundData = null;
+        for (let i = data.length - 1; i >= 0; i--) {
+          const jsonData = JSON.parse(data[i]);
+          if (jsonData["도로명코드"] === apartmentCode) {
+            foundData = jsonData;
+            break;
+          }
+        }
+        return foundData;
+      }
+
+      function showChart(monthData) {
+        let ctx = document.getElementById("chart").getContext("2d");
+        if (Object.keys(monthData).length === 0) {
+          new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: [],
+              datasets: [],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              title: {
+                display: true,
+                text: "데이터가 없습니다.",
+              },
+            },
+          });
+        } else {
+          let transactionVolumes = calculateTransactionVolumes(monthData);
+          let averagePrices = calculateAveragePrices(monthData);
+
+          let myChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: [
+                "1월",
+                "2월",
+                "3월",
+                "4월",
+                "5월",
+                "6월",
+                "7월",
+                "8월",
+                "9월",
+                "10월",
+              ],
+              datasets: [
+                {
+                  type: "line",
+                  label: "평균 거래금액(만원)",
+                  data: averagePrices,
+                  borderColor: "rgba(75, 192, 192, 1)",
+                  borderWidth: 2,
+                  fill: false,
+                  yAxisID: "y-axis-1",
+                },
+                {
+                  type: "bar",
+                  label: "거래량",
+                  data: transactionVolumes,
+                  backgroundColor: [
+                    "rgba(255, 99, 132, 0.2)",
+                    "rgba(54, 162, 235, 0.2)",
+                    "rgba(255, 206, 86, 0.2)",
+                    "rgba(75, 192, 192, 0.2)",
+                    "rgba(153, 102, 255, 0.2)",
+                    "rgba(255, 99, 132, 0.2)",
+                    "rgba(54, 162, 235, 0.2)",
+                    "rgba(255, 206, 86, 0.2)",
+                    "rgba(75, 192, 192, 0.2)",
+                    "rgba(153, 102, 255, 0.2)",
+                  ],
+                  borderColor: [
+                    "rgba(255, 99, 132, 1)",
+                    "rgba(54, 162, 235, 1)",
+                    "rgba(255, 206, 86, 1)",
+                    "rgba(75, 192, 192, 1)",
+                    "rgba(153, 102, 255, 1)",
+                    "rgba(255, 99, 132, 1)",
+                    "rgba(54, 162, 235, 1)",
+                    "rgba(255, 206, 86, 1)",
+                    "rgba(75, 192, 192, 1)",
+                    "rgba(153, 102, 255, 1)",
+                  ],
+                  borderWidth: 1,
+                  yAxisID: "y-axis-2",
+                },
+              ],
+            },
+            options: {
+              scales: {
+                yAxes: [
+                  {
+                    type: "linear",
+                    display: true,
+                    position: "left",
+                    id: "y-axis-1",
+                    labelString: "평균 거래금액(만원)",
+                  },
+                  {
+                    type: "linear",
+                    display: true,
+                    position: "right",
+                    id: "y-axis-2",
+                    labelString: "거래량",
+                  },
+                ],
+                xAxes: [
+                  {
+                    display: true,
+                    scaleLabel: {
+                      display: true,
+                      labelString: "월",
+                    },
+                  },
+                ],
+              },
+            },
+          });
+        }
+      }
+
+      function monthApartmentData(foundData, data) {
+        const jsonData = JSON.parse(data)
+        if (foundData) {
+          let monthData = {
+            jan: [],
+            feb: [],
+            mar: [],
+            apr: [],
+            may: [],
+            jun: [],
+            jul: [],
+            aug: [],
+            sep: [],
+            oct: [],
+          };
+
+          data.forEach((item) => {
+            if (item["도로명코드"] === foundData["도로명코드"]) {
+              switch (item["월"]) {
+                case "1":
+                  monthData.jan.push(item);
+                  break;
+                case "2":
+                  monthData.feb.push(item);
+                  break;
+                case "3":
+                  monthData.mar.push(item);
+                  break;
+                case "4":
+                  monthData.apr.push(item);
+                  break;
+                case "5":
+                  monthData.may.push(item);
+                  break;
+                case "6":
+                  monthData.jun.push(item);
+                  break;
+                case "7":
+                  monthData.jul.push(item);
+                  break;
+                case "8":
+                  monthData.aug.push(item);
+                  break;
+                case "9":
+                  monthData.sep.push(item);
+                  break;
+                case "10":
+                  monthData.oct.push(item);
+                  break;
+                default:
+                  break;
+              }
+            }
+          });
+          return monthData;
+        } else {
+          return "";
+        }
+      }
+
+      function calculateAveragePrices(monthData) {
+        let averagePrices = [];
+        for (const month in monthData) {
+          let total = 0;
+          monthData[month].forEach((item) => {
+            let price = parseFloat(item["거래금액"].replace(/,/g, ""));
+            total += price;
+          });
+          let average =
+            monthData[month].length > 0 ? total / monthData[month].length : 0;
+          averagePrices.push(average);
+        }
+        return averagePrices;
+      }
+
+      function calculateTransactionVolumes(monthData) {
+        let transactionVolumes = [];
+        for (const month in monthData) {
+          transactionVolumes.push(monthData[month].length);
+        }
+        return transactionVolumes;
+      }
+    </script>
+  </body>
+  <script
+    src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+    integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
+    crossorigin="anonymous"
+  ></script>
+</html>
