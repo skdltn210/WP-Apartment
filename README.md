@@ -18,9 +18,9 @@
 
 ## 기술 스택
 
-|  HTML   |  CSS   | JavaScript |  Node   | Express      | MongoDB    | BootStrap    | KakaoMap                                 |
-| :-----: | :----: | :--------: | :-----: | ------------ | ---------- | ------------ | ---------------------------------------- |
-| ![html] | ![css] |   ![js]    | ![node] | ![expressjs] | ![mongodb] | ![bootstrap] | <img src="./images/stack/kakao_map.png"> |
+|  HTML   |  CSS   | JavaScript |  Node   | Express      | MongoDB    | BootStrap    | KakaoMap                                                          |
+| :-----: | :----: | :--------: | :-----: | ------------ | ---------- | ------------ | ----------------------------------------------------------------- |
+| ![html] | ![css] |   ![js]    | ![node] | ![expressjs] | ![mongodb] | ![bootstrap] | <img src="./images/stack/kakao_map.png" width="50%" height="50%"> |
 
 <br>
 
