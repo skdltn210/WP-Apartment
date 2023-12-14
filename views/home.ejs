@@ -4,10 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>아파트 거래정보</title>
-    <script
-      type="text/javascript"
-      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b50b4f49e5237883c18078faad157119&libraries=services,clusterer,drawing"
-    ></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b50b4f49e5237883c18078faad157119&libraries=services,clusterer,drawing"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment"></script>
     <link
@@ -16,10 +13,7 @@
       integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I"
       crossorigin="anonymous"
     />
-    <script
-      crossorigin="anonymous"
-      src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"
-    ></script>
+    <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
@@ -41,42 +35,15 @@
           <div class="container-fluid mt-3">
             <div class="d-flex justify-content-between">
               <div class="btn-group mb-1" role="group">
-                <input
-                  type="radio"
-                  class="btn-check"
-                  name="btnradio"
-                  id="btnradio1"
-                  autocomplete="off"
-                  value="1"
-                  checked
-                />
-                <label class="btn btn-outline-primary" for="btnradio1"
-                  >거래정보</label
-                >
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" value="1" checked />
+                <label class="btn btn-outline-primary" for="btnradio1">거래정보</label>
 
-                <input
-                  type="radio"
-                  class="btn-check"
-                  name="btnradio"
-                  id="btnradio2"
-                  autocomplete="off"
-                  value="2"
-                />
-                <label class="btn btn-outline-primary" for="btnradio2"
-                  >그래프</label
-                >
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" value="2" />
+                <label class="btn btn-outline-primary" for="btnradio2">그래프</label>
               </div>
               <form id="searchForm" class="d-flex mr-2" role="search">
-                <input
-                  id="searchInput"
-                  class="form-control me-2 ms-2"
-                  type="search"
-                  placeholder="Search"
-                  aria-label="Search"
-                />
-                <button id="searchButton" class="btn btn-outline-primary me-2">
-                  Search
-                </button>
+                <input id="searchInput" class="form-control me-2 ms-2" type="search" placeholder="Search" aria-label="Search" />
+                <button id="searchButton" class="btn btn-outline-primary me-2">Search</button>
               </form>
             </div>
             <div id="apartmentDetails">
@@ -496,6 +463,7 @@
                 "9월",
                 "10월",
                 "11월",
+                "12월"
               ],
               datasets: [
                 {
@@ -523,6 +491,7 @@
                     "rgba(255, 206, 86, 0.2)",
                     "rgba(75, 192, 192, 0.2)",
                     "rgba(153, 102, 255, 0.2)",
+                    "rgba(255, 159, 64, 0.2)",
                   ],
                   borderColor: [
                     "rgba(255, 99, 132, 1)",
@@ -536,6 +505,7 @@
                     "rgba(255, 206, 86, 1)",
                     "rgba(75, 192, 192, 1)",
                     "rgba(153, 102, 255, 1)",
+                    "rgba(255, 159, 64, 1)",
                   ],
                   borderWidth: 1,
                   yAxisID: "y-axis-2",
@@ -597,6 +567,7 @@
             sep: [],
             oct: [],
             nov: [],
+            dec: []
           };
 
           parsedData.forEach((item) => {
@@ -634,6 +605,9 @@
                   break;
                 case "11":
                   monthData.nov.push(item);
+                  break;
+                case "12":
+                  monthData.dec.push(item);
                   break;
                 default:
                   break;

@@ -75,7 +75,7 @@ app.get("/", async (req, res) => {
       const startYear = 2023;
       const endYear = 2023;
       const startMonth = 1;
-      const endMonth = 11;
+      const endMonth = 12;
 
       const fetchData = async (bcode, ymd) => {
         const params = {
