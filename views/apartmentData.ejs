@@ -4,10 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>아파트 정보</title>
-    <script
-      type="text/javascript"
-      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b50b4f49e5237883c18078faad157119&libraries=services,clusterer,drawing"
-    ></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b50b4f49e5237883c18078faad157119&libraries=services,clusterer,drawing"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment"></script>
     <link
@@ -16,10 +13,7 @@
       integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I"
       crossorigin="anonymous"
     />
-    <script
-      crossorigin="anonymous"
-      src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"
-    ></script>
+    <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   </head>
 
@@ -38,82 +32,29 @@
             <div class="card" style="margin-top: 15px">
               <div class="card-body">
                 <h1>아파트 정보</h1>
-                <form
-                  action="/apartmentData/<%= currentUser._id %>"
-                  method="post"
-                >
+                <form action="/apartmentData/<%= currentUser._id %>" method="POST" id="apartmentForm">
                   <div class="mb-2">
                     <label class="form-label" for="name">이름</label>
-                    <input
-                      class="form-control"
-                      type="text"
-                      id="name"
-                      name="name"
-                      required
-                    />
+                    <input class="form-control" type="text" id="name" name="name" required />
                   </div>
                   <div class="mb-2">
                     <label class="form-label" for="location">아파트 주소</label>
                     <div class="d-flex">
-                      <input
-                        class="form-control mb-2"
-                        type="text"
-                        id="sample6_postcode"
-                        placeholder="우편번호"
-                        name="postcode"
-                        required
-                      />
-                      <input
-                        class="btn btn-primary mb-2"
-                        type="button"
-                        onclick="sample6_execDaumPostcode()"
-                        value="우편번호 찾기"
-                      /><br />
+                      <input class="form-control mb-2" type="text" id="sample6_postcode" placeholder="우편번호" name="postcode" required readonly />
+                      <input class="btn btn-primary mb-2" type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기" /><br />
                     </div>
 
-                    <input
-                      class="form-control"
-                      type="text"
-                      id="sample6_address"
-                      placeholder="주소"
-                      name="address"
-                      required
-                    />
+                    <input class="form-control" type="text" id="sample6_address" placeholder="주소" name="address" required readonly />
                     <div class="d-flex mt-2">
-                      <input
-                        class="form-control mr-1"
-                        type="text"
-                        id="sample6_bcode"
-                        placeholder="법정동코드"
-                        name="bcode"
-                        required
-                      />
-                      <input
-                        class="form-control"
-                        type="text"
-                        id="sample6_roadnameCode"
-                        placeholder="도로명코드"
-                        name="roadnameCode"
-                        required
-                      />
+                      <input class="form-control mr-1" type="text" id="sample6_bcode" placeholder="법정동코드" name="bcode" required readonly />
+                      <input class="form-control" type="text" id="sample6_roadnameCode" placeholder="도로명코드" name="roadnameCode" required readonly />
                     </div>
                     <div class="d-flex mt-2">
-                      <input
-                        class="form-control mr-1"
-                        type="text"
-                        id="sample6_detailAddress"
-                        placeholder="상세주소"
-                        name="address2"
-                      />
-                      <input
-                        class="form-control"
-                        type="text"
-                        id="sample6_extraAddress"
-                        placeholder="참고항목"
-                        name="references"
-                      />
+                      <input class="form-control mr-1" type="text" id="sample6_detailAddress" placeholder="상세주소" name="address2" />
+                      <input class="form-control" type="text" id="sample6_extraAddress" placeholder="참고항목" name="references" />
                     </div>
                   </div>
+                  <input type="hidden" name="_method" id="methodInput" value="POST" />
                   <div>
                     <button class="btn btn-success">등록</button>
                   </div>
@@ -129,6 +70,7 @@
                         <th scope="col">법정동코드</th>
                         <th scope="col">도로명코드</th>
                         <th scope="col">참고항목</th>
+                        <th scope="col">수정</th>
                         <th scope="col">삭제</th>
                       </tr>
                     </thead>
@@ -143,10 +85,15 @@
                         <td><%= apartment.roadnameCode %></td>
                         <td><%= apartment.references %></td>
                         <td>
-                          <form
-                            action="/apartmentData/<%= user._id %>/delete/<%= apartment._id %>"
-                            method="POST"
+                          <button
+                            class="btn btn-secondary me-2"
+                            onclick="editApartment('<%= apartment.name %>', '<%= apartment.postcode %>', '<%= apartment.address %>', '<%= apartment.address2 %>', '<%= apartment.bcode %>', '<%= apartment.roadnameCode %>', '<%= apartment.references %>')"
                           >
+                            수정
+                          </button>
+                        </td>
+                        <td>
+                          <form action="/apartmentData/<%= user._id %>/delete/<%= apartment._id %>" method="POST">
                             <button class="btn btn-danger me-2">삭제</button>
                           </form>
                         </td>
@@ -178,10 +125,7 @@
                 extraAddr += data.bname;
               }
               if (data.buildingName !== "" && data.apartment === "Y") {
-                extraAddr +=
-                  extraAddr !== ""
-                    ? ", " + data.buildingName
-                    : data.buildingName;
+                extraAddr += extraAddr !== "" ? ", " + data.buildingName : data.buildingName;
               }
               if (extraAddr !== "") {
                 extraAddr = " (" + extraAddr + ")";
@@ -195,11 +139,19 @@
             document.getElementById("sample6_address").value = addr;
             var bcode5 = data.bcode.substring(0, 5);
             document.getElementById("sample6_bcode").value = bcode5;
-            document.getElementById("sample6_roadnameCode").value =
-              data.roadnameCode;
+            document.getElementById("sample6_roadnameCode").value = data.roadnameCode;
             document.getElementById("sample6_detailAddress").focus();
           },
         }).open();
+      }
+      function editApartment(name, postcode, address, address2, bcode, roadnameCode, references) {
+        document.getElementById("name").value = name;
+        document.getElementById("sample6_postcode").value = postcode;
+        document.getElementById("sample6_address").value = address;
+        document.getElementById("sample6_detailAddress").value = address2;
+        document.getElementById("sample6_bcode").value = bcode;
+        document.getElementById("sample6_roadnameCode").value = roadnameCode;
+        document.getElementById("sample6_extraAddress").value = references;
       }
     </script>
   </body>

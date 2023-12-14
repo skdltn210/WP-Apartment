@@ -12,10 +12,8 @@ const User = require("./models/user");
 const Apartment = require("./models/apartment");
 const xml2js = require("xml2js");
 
-const key =
-  "CLce6nrfsFXfHRs/88XzAmoWAyKMitpJByuirDon+0VZiPutnUhb1ynL+TtsrT6TqAVBh4gjXdFMcOxRFgDUsQ==";
-const url =
-  "http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev";
+const key = "CLce6nrfsFXfHRs/88XzAmoWAyKMitpJByuirDon+0VZiPutnUhb1ynL+TtsrT6TqAVBh4gjXdFMcOxRFgDUsQ==";
+const url = "http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev";
 
 mongoose.connect("mongodb://0.0.0.0:27017/apartment", {
   useNewUrlParser: true,
@@ -254,44 +252,56 @@ app.get("/apartmentData/:id", async (req, res) => {
 
 app.post("/apartmentData/:id", async (req, res) => {
   try {
-    const {
-      name,
-      postcode,
-      address,
-      address2,
-      bcode,
-      references,
-      roadnameCode,
-    } = req.body;
+    const { name, postcode, address, address2, bcode, references, roadnameCode } = req.body;
+
     const existingApartment = await Apartment.findOne({ address });
 
     if (existingApartment) {
-      req.flash("error", "이미 해당 주소의 아파트가 존재합니다.");
-      return res.redirect(`/apartmentData/${req.params.id}`);
+      existingApartment.name = name;
+      existingApartment.postcode = postcode;
+      existingApartment.address2 = address2;
+      existingApartment.bcode = bcode;
+      existingApartment.references = references;
+      existingApartment.roadnameCode = roadnameCode;
+
+      await existingApartment.save();
+
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        req.flash("error", "사용자를 찾을 수 없습니다.");
+        return res.redirect("/");
+      }
+
+      if (!user.apartments.includes(existingApartment._id)) {
+        user.apartments.push(existingApartment);
+        await user.save();
+      }
+
+      res.redirect(`/apartmentData/${req.params.id}`);
+    } else {
+      const apartment = new Apartment({
+        name,
+        postcode,
+        address,
+        address2,
+        bcode,
+        references,
+        roadnameCode,
+      });
+
+      await apartment.save();
+      const user = await User.findById(req.params.id);
+
+      if (!user) {
+        req.flash("error", "사용자를 찾을 수 없습니다.");
+        return res.redirect("/");
+      }
+
+      user.apartments.push(apartment);
+      await user.save();
+
+      res.redirect(`/apartmentData/${req.params.id}`);
     }
-
-    const apartment = new Apartment({
-      name,
-      postcode,
-      address,
-      address2,
-      bcode,
-      references,
-      roadnameCode,
-    });
-
-    await apartment.save();
-    const user = await User.findById(req.params.id);
-
-    if (!user) {
-      req.flash("error", "사용자를 찾을 수 없습니다.");
-      return res.redirect("/");
-    }
-
-    user.apartments.push(apartment);
-    await user.save();
-
-    res.redirect(`/apartmentData/${req.params.id}`);
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
